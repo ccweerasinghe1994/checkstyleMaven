@@ -1,0 +1,25 @@
+#!/bin/sh
+
+# Find the root directory of the git repository
+REPO_ROOT=$(git rev-parse --show-toplevel)
+
+# Construct the path to the checkstyle jar file relative to the repository root
+CHECKSTYLE_JAR="$REPO_ROOT/config/checkstyle/checkstyle-10.17.0-all.jar"
+
+# Checkstyle configuration file
+CHECKSTYLE_CONFIG="$REPO_ROOT/config/checkstyle/checkstyle.xml"
+
+# Directory or file to check
+SRC_DIRECTORY="$REPO_ROOT/src/"
+
+# Running Checkstyle
+java -jar "$CHECKSTYLE_JAR" -c "$CHECKSTYLE_CONFIG" "$SRC_DIRECTORY"
+
+# Check if Checkstyle found any issues
+if [ $? -eq 0 ]; then
+    echo "Checkstyle checks passed."
+    exit 0
+else
+    echo "Checkstyle violations found. Please fix them before committing."
+    exit 1
+fi

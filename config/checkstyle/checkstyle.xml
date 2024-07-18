@@ -1,0 +1,599 @@
+<?xml version="1.0"?>
+<!DOCTYPE module PUBLIC
+        "-//Checkstyle//DTD Checkstyle Configuration 1.3//EN"
+        "https://checkstyle.org/dtds/configuration_1_3.dtd">
+
+<module name = "Checker">
+
+    <!-- Specifies the character encoding that Checkstyle will use to read the source files. UTF-8 is a widely used character encoding that supports all Unicode characters. -->
+    <property name="charset" value="UTF-8"/>
+
+    <!-- Severity Level Configuration -->
+    <!-- This property sets the severity level for all Checkstyle checks. If a check finds a violation, it will be reported with this severity level. In this case, "error" means that violations are detected by Checkstyle. -->
+    <property name="severity" value="error"/>
+
+    <!-- File Extensions Configuration -->
+    <!-- Specifies the file extensions that Checkstyle will check. This property enhances Checkstyle's flexibility by allowing it to operate on Java, properties, and XML files. -->
+    <property name="fileExtensions" value="java, properties, xml"/>
+
+    <!-- Before Execution Exclusion File Filter -->
+    <!-- Defines a pattern for files to be excluded from Checkstyle checks before any checks are executed. This is particularly useful for excluding module-info.java files, which might not adhere to the same styling rules as other Java files. -->
+    <module name="BeforeExecutionExclusionFileFilter">
+        <property name="fileNamePattern" value="module\-info\.java$"/>
+    </module>
+    <!-- Suppression Filter Configuration -->
+    <!-- Allows specifying an external suppression file where specific rules can be suppressed for certain files. This module supports dynamic suppression through properties and provides an option to make the suppression file optional. -->
+    <module name="SuppressionFilter">
+        <property name="file" value="${org.checkstyle.google.suppressionfilter.config}"
+                  default="checkstyle-suppressions.xml" />
+        <property name="optional" value="true"/>
+    </module>
+    <!-- File Tab Character Check -->
+    <!-- Enforces the absence of tab characters in the source code. This check ensures that spaces are used instead of tabs for indentation to maintain consistency across different IDEs and text editors. -->
+    <module name="FileTabCharacter">
+        <property name="eachLine" value="true"/>
+    </module>
+
+    <!-- Line Length Module Configuration -->
+    <!-- This module enforces a maximum line length constraint. It is primarily configured for Java source files but can be adapted for other file types. -->
+
+    <module name="LineLength">
+        <!-- Specifies the file extensions to which this rule applies, enhancing flexibility. -->
+        <property name="fileExtensions" value="java"/>
+        <!-- Sets the maximum allowed length of a line. Lines exceeding this length will trigger a warning or error. -->
+        <property name="max" value="100"/>
+        <!-- Defines a regular expression pattern for lines to ignore. Useful for excluding lines with URLs or package and import statements that may exceed the line length limit. -->
+        <property name="ignorePattern" value="^package.*|^import.*|a href|href|http://|https://|ftp://"/>
+    </module>
+
+    <!-- TreeWalker Module Configuration -->
+    <!-- The TreeWalker module is a crucial component of Checkstyle that walks through the abstract syntax tree (AST) of Java source files. It hosts a set of sub-modules, each responsible for enforcing different coding standards and rules. This modular approach allows for comprehensive and customizable code analysis, targeting various aspects of coding practices such as naming conventions, whitespace usage, and block structure. -->
+    <module name="TreeWalker">
+
+        <!-- Unused Imports Check -->
+        <!-- This module checks for and reports any import statements that are not used by the Java file. It helps in keeping the codebase clean and ensuring that only necessary imports are included. -->
+        <module name="UnusedImports"/>
+
+        <!-- Outer Type Filename Check -->
+        <!-- This module ensures that the outer type name and the filename containing it match. It helps maintain a clean and understandable project structure by enforcing a standard naming convention for Java files and their primary types. -->
+        <module name="OuterTypeFilename"/>
+
+        <!-- Illegal Token Text Check -->
+        <!-- This module checks for the use of certain Unicode or octal escape sequences in string literals and character literals. It aims to encourage the use of more readable escape sequences when possible. -->
+        <module name="IllegalTokenText">
+            <!-- Specifies the token types to check, focusing on string and character literals. -->
+            <property name="tokens" value="STRING_LITERAL, CHAR_LITERAL"/>
+            <!-- Defines the regular expression pattern that matches the disallowed Unicode or octal escape sequences. -->
+            <property name="format"
+                      value="\\u00(09|0(a|A)|0(c|C)|0(d|D)|22|27|5(C|c))|\\(0(10|11|12|14|15|42|47)|134)"/>
+            <!-- Custom message to display when a violation is found, suggesting the use of special escape sequences for clarity. -->
+            <property name="message"
+                      value="Consider using special escape sequence instead of octal value or Unicode escaped value."/>
+        </module>
+
+        <!-- Avoid Escaped Unicode Characters Module -->
+        <!-- This module is designed to restrict the use of escaped Unicode characters in the source code. It aims to improve code readability by encouraging the use of actual characters or alternative escape sequences where possible. -->
+        <module name="AvoidEscapedUnicodeCharacters">
+            <!-- Allows escapes for control characters (e.g., newline, tab) to ensure essential escapes are not flagged. -->
+            <property name="allowEscapesForControlCharacters" value="true"/>
+            <!-- Permits the use of escaped Unicode characters if they are followed by a tail comment, providing context or justification for their use. -->
+            <property name="allowByTailComment" value="true"/>
+            <!-- Enables the use of escapes for non-printable characters, accommodating cases where direct character representation is not feasible. -->
+            <property name="allowNonPrintableEscapes" value="true"/>
+        </module>
+
+        <!-- Avoid Star Import Check -->
+        <!-- This module checks for and discourages the use of star imports (e.g., import java.util.*;). Using individual imports helps to clarify which classes are actually needed and can improve readability and understanding of the code. -->
+        <module name="AvoidStarImport"/>
+
+        <!-- One Top Level Class Check -->
+        <!-- This module ensures that each Java source file contains only one top-level class. This practice enhances code readability and maintainability by keeping the structure of classes clear and concise. -->
+        <module name="OneTopLevelClass"/>
+
+        <!-- No Line Wrap Check -->
+        <!-- This module enforces that package, import, and static import statements are not line-wrapped. It ensures that these statements appear on a single line each, promoting readability and consistency across the codebase. -->
+        <module name="NoLineWrap">
+            <property name="tokens" value="PACKAGE_DEF, IMPORT, STATIC_IMPORT"/>
+        </module>
+
+        <!-- Empty Block Check -->
+        <!-- This module is designed to enforce the handling of empty blocks in the code. It can be configured to ensure that empty blocks are either documented with a comment or follow a specific convention. This helps in maintaining clarity in the codebase, especially in cases where an empty block might be intentional but could be confusing without proper documentation. -->
+        <module name="EmptyBlock">
+            <!-- Specifies the handling option for empty blocks. "TEXT" indicates that a textual explanation is expected within the empty block. -->
+            <property name="option" value="TEXT"/>
+            <!-- Defines the specific tokens (block types) that this rule applies to, including various control structures that might contain blocks. -->
+            <property name="tokens"
+                      value="LITERAL_TRY, LITERAL_FINALLY, LITERAL_IF, LITERAL_ELSE, LITERAL_SWITCH"/>
+        </module>
+
+        <!-- Need Braces Check -->
+        <!-- This module enforces the use of braces around the body of do, else, for, if, and while statements. This practice enhances the readability and structure of the code, making it easier to understand and maintain. -->
+        <module name="NeedBraces">
+            <!-- Specifies the statement types to which this rule applies, ensuring that each is enclosed in braces. -->
+            <property name="tokens"
+                      value="LITERAL_DO, LITERAL_ELSE, LITERAL_FOR, LITERAL_IF, LITERAL_WHILE"/>
+        </module>
+
+        <!-- Left Curly Brace Position Check -->
+        <!-- This module checks the placement of left curly braces ('{') for various code blocks. It ensures that the opening brace is placed correctly according to the coding standards. This check is applied to a variety of elements including classes, methods, constructors, annotations, control structures, and more, to maintain consistency and readability in the code structure. -->
+        <module name="LeftCurly">
+            <!-- Specifies the code elements to which this rule applies. It includes definitions for classes, interfaces, methods, constructors, annotations, control structures (like if, for, try, etc.), and blocks. This comprehensive list ensures that the placement of left curly braces is consistent across different types of code structures. -->
+            <property name="tokens"
+                      value="ANNOTATION_DEF, CLASS_DEF, CTOR_DEF, ENUM_CONSTANT_DEF, ENUM_DEF,
+            INTERFACE_DEF, LAMBDA, LITERAL_CASE, LITERAL_CATCH, LITERAL_DEFAULT,
+            LITERAL_DO, LITERAL_ELSE, LITERAL_FINALLY, LITERAL_FOR, LITERAL_IF,
+            LITERAL_SWITCH, LITERAL_SYNCHRONIZED, LITERAL_TRY, LITERAL_WHILE, METHOD_DEF,
+            OBJBLOCK, STATIC_INIT, RECORD_DEF, COMPACT_CTOR_DEF"/>
+        </module>
+
+        <!-- Right Curly Brace Check (Same Line) -->
+        <!-- This module checks the placement of right curly braces ('}') for specific code blocks. It enforces that the right curly brace is on the same
+             line as the next part of a multi-block statement (e.g., 'else', 'catch'). This rule applies to try, catch, finally, if, else, and do statements,
+             ensuring consistency and readability in the code structure. -->
+        <module name="RightCurly">
+            <property name="id" value="RightCurlySame"/>
+            <property name="tokens"
+                      value="LITERAL_TRY, LITERAL_CATCH, LITERAL_FINALLY, LITERAL_IF, LITERAL_ELSE,
+            LITERAL_DO"/>
+        </module>
+
+        <!-- Right Curly Brace Check (Alone) -->
+        <!-- This module ensures that the right curly brace ('}') for specific code blocks is placed alone on a line. It applies to class definitions,
+             method definitions, constructor definitions, loop constructs (for, while), static and instance initializers, annotations, enums, interfaces,
+             records, and compact constructors. This formatting style enhances readability and consistency in the code structure. -->
+        <module name="RightCurly">
+            <property name="id" value="RightCurlyAlone"/>
+            <property name="option" value="alone"/>
+            <property name="tokens"
+                      value="CLASS_DEF, METHOD_DEF, CTOR_DEF, LITERAL_FOR, LITERAL_WHILE, STATIC_INIT,
+            INSTANCE_INIT, ANNOTATION_DEF, ENUM_DEF, INTERFACE_DEF, RECORD_DEF,
+            COMPACT_CTOR_DEF"/>
+        </module>
+
+        <!-- SuppressionXpathSingleFilter Module -->
+        <!-- This module is used to suppress specific coding violations for certain code blocks temporarily. It is particularly useful for cases where a known issue,
+         such as a bug in Checkstyle, affects the correctness of violation reports.
+         The suppression is defined by an XPath query targeting the syntax tree of the Java code, allowing for precise control over which violations to suppress. -->
+        <module name="SuppressionXpathSingleFilter">
+            <!-- Explanation for the suppression: This suppression is required until the issue https://github.com/checkstyle/checkstyle/issues/7541 is resolved. -->
+            <property name="id" value="RightCurlyAlone"/>
+            <!-- XPath query defining the suppression criteria: Suppresses the "RightCurlyAlone" rule violations for right curly braces that are either the only child of an SLIST node or immediately follow an LCURLY node as the last sibling. This targets specific code structure patterns where the right curly brace's placement might falsely trigger a violation. -->
+            <property name="query" value="//RCURLY[parent::SLIST[count(./*)=1]
+                             or preceding-sibling::*[last()][self::LCURLY]]"/>
+        </module>
+
+        <!-- Whitespace After Check -->
+        <!-- This module checks for whitespace after specific tokens to ensure proper spacing following Java coding standards. It enhances readability and consistency in the code. -->
+        <module name="WhitespaceAfter">
+            <!-- Specifies the tokens after which whitespace is required. This includes common separators and control structures, ensuring that the code is well-formatted and easy to read. -->
+            <property name="tokens"
+                      value="COMMA, SEMI, TYPECAST, LITERAL_IF, LITERAL_ELSE,
+            LITERAL_WHILE, LITERAL_DO, LITERAL_FOR, DO_WHILE"/>
+        </module>
+
+        <!-- Whitespace Around Check -->
+        <!-- This module enforces whitespace around specific tokens to ensure code readability and consistency with Java coding standards. It applies to a wide range of tokens including assignment operators, logical operators, and control structures. The module also provides flexibility by allowing empty constructs to be exempt from this rule, catering to various coding styles and preferences. -->
+        <module name="WhitespaceAround">
+            <!-- Allows empty constructors to bypass the whitespace check, accommodating compact constructor definitions. -->
+            <property name="allowEmptyConstructors" value="true"/>
+            <!-- Permits empty lambda expressions to omit surrounding whitespace, supporting concise lambda syntax. -->
+            <property name="allowEmptyLambdas" value="true"/>
+            <!-- Exempts empty methods from the whitespace requirement, allowing methods with empty bodies to be more compact. -->
+            <property name="allowEmptyMethods" value="true"/>
+            <!-- Allows types with empty bodies to not have whitespace around them, useful for empty interface or class declarations. -->
+            <property name="allowEmptyTypes" value="true"/>
+            <!-- Permits loops without a body (e.g., for(;;);) to not have whitespace around them, supporting certain control flow constructs. -->
+            <property name="allowEmptyLoops" value="true"/>
+            <!-- Determines whether the colon in enhanced for-loops must be followed by whitespace. -->
+            <property name="ignoreEnhancedForColon" value="false"/>
+            <!-- Specifies the tokens that should be surrounded by whitespace. This includes a variety of operators, keywords, and braces. -->
+            <property name="tokens"
+                      value="ASSIGN, BAND, BAND_ASSIGN, BOR, BOR_ASSIGN, BSR, BSR_ASSIGN, BXOR,
+            BXOR_ASSIGN, COLON, DIV, DIV_ASSIGN, DO_WHILE, EQUAL, GE, GT, LAMBDA, LAND,
+            LCURLY, LE, LITERAL_CATCH, LITERAL_DO, LITERAL_ELSE, LITERAL_FINALLY,
+            LITERAL_FOR, LITERAL_IF, LITERAL_RETURN, LITERAL_SWITCH, LITERAL_SYNCHRONIZED,
+            LITERAL_TRY, LITERAL_WHILE, LOR, LT, MINUS, MINUS_ASSIGN, MOD, MOD_ASSIGN,
+            NOT_EQUAL, PLUS, PLUS_ASSIGN, QUESTION, RCURLY, SL, SLIST, SL_ASSIGN, SR,
+            SR_ASSIGN, STAR, STAR_ASSIGN, LITERAL_ASSERT, TYPE_EXTENSION_AND"/>
+            <!-- Custom messages for violations when a token is not followed or preceded by whitespace. -->
+            <message key="ws.notFollowed"
+                     value="WhitespaceAround: ''{0}'' is not followed by whitespace. Empty blocks may only be represented as '{}' when not part of a multi-block statement (4.1.3)"/>
+            <message key="ws.notPreceded"
+                     value="WhitespaceAround: ''{0}'' is not preceded with whitespace."/>
+        </module>
+
+        <!-- One Statement Per Line -->
+        <!-- This module enforces that each line contains only one statement. It helps in maintaining code clarity and readability by avoiding multiple statements on a single line. -->
+        <module name="OneStatementPerLine"/>
+
+        <!-- Multiple Variable Declarations -->
+        <!-- This module checks for multiple variable declarations on the same line. It encourages declaring each variable on its own line to enhance code readability and maintainability. -->
+        <module name="MultipleVariableDeclarations"/>
+
+        <!-- Array Type Style -->
+        <!-- This module ensures consistency in the declaration of array types. It can enforce Java style (type[]) or C style (type []) array declarations, promoting uniformity across the codebase. -->
+        <module name="ArrayTypeStyle"/>
+
+        <!-- Missing Switch Default -->
+        <!-- This module checks for the absence of the default case in switch statements. Including a default case improves the robustness of the code by handling unexpected values. -->
+        <module name="MissingSwitchDefault"/>
+
+        <!-- Fall Through -->
+        <!-- This module checks for fall-through behavior in switch-case statements. It ensures that each case explicitly ends with a break statement or has a comment indicating intentional fall-through, preventing unintentional execution flow. -->
+        <module name="FallThrough"/>
+
+        <!-- Upper Ell -->
+        <!-- This module checks that long literals use an uppercase 'L' rather than lowercase to avoid confusion with the digit '1', enhancing code readability. -->
+        <module name="UpperEll"/>
+
+        <!-- Modifier Order -->
+        <!-- This module enforces the standard Java modifier order in declarations, following the Java Language Specification. Correct ordering of modifiers improves code readability and consistency. -->
+        <module name="ModifierOrder"/>
+
+        <!-- Empty Line Separator Check -->
+        <!-- This module ensures that there is a separation of concerns by enforcing empty lines between package declarations, import statements, class definitions, and other significant code blocks. It enhances readability and maintainability of the code. -->
+        <module name="EmptyLineSeparator">
+            <property name="tokens"
+                      value="PACKAGE_DEF, IMPORT, STATIC_IMPORT, CLASS_DEF, INTERFACE_DEF, ENUM_DEF,
+            STATIC_INIT, INSTANCE_INIT, METHOD_DEF, CTOR_DEF, VARIABLE_DEF, RECORD_DEF,
+            COMPACT_CTOR_DEF"/>
+            <property name="allowNoEmptyLineBetweenFields" value="true"/>
+        </module>
+
+        <!-- Separator Wrap Checks -->
+        <!-- These modules enforce specific line wrapping policies for dots, commas, ellipses, array declarators, and method references. They ensure consistency in the code's visual structure, making it easier to read and understand. -->
+
+        <!-- Enforces that dots ('.') are wrapped to the next line. -->
+        <module name="SeparatorWrap">
+            <property name="id" value="SeparatorWrapDot"/>
+            <property name="tokens" value="DOT"/>
+            <property name="option" value="nl"/>
+        </module>
+
+        <!-- Enforces that commas (',') are wrapped to the end of line. -->
+        <module name="SeparatorWrap">
+            <property name="id" value="SeparatorWrapComma"/>
+            <property name="tokens" value="COMMA"/>
+            <property name="option" value="EOL"/>
+        </module>
+
+        <!-- Enforces that ellipses ('...') are wrapped to the end of line. Note: This is a temporary measure until a specific style guide issue is resolved. -->
+        <module name="SeparatorWrap">
+            <!-- ELLIPSIS is EOL until https://github.com/google/styleguide/issues/259 -->
+            <property name="id" value="SeparatorWrapEllipsis"/>
+            <property name="tokens" value="ELLIPSIS"/>
+            <property name="option" value="EOL"/>
+        </module>
+
+        <!-- Enforces that array declarators ('[]') are wrapped to the end of line. Note: This is a temporary measure until a specific style guide issue is resolved. -->
+        <module name="SeparatorWrap">
+            <!-- ARRAY_DECLARATOR is EOL until https://github.com/google/styleguide/issues/258 -->
+            <property name="id" value="SeparatorWrapArrayDeclarator"/>
+            <property name="tokens" value="ARRAY_DECLARATOR"/>
+            <property name="option" value="EOL"/>
+        </module>
+
+        <!-- Enforces that method references ('::') are wrapped to the next line. -->
+        <module name="SeparatorWrap">
+            <property name="id" value="SeparatorWrapMethodRef"/>
+            <property name="tokens" value="METHOD_REF"/>
+            <property name="option" value="nl"/>
+        </module>
+
+        <!-- PackageName Module -->
+        <!-- Ensures package names adhere to a specific format, promoting consistency and readability across the codebase. -->
+        <module name="PackageName">
+            <!-- Regular expression defining the allowed package name format. -->
+            <property name="format" value="^[a-z]+(\.[a-z][a-z0-9]*)*$"/>
+            <!-- Custom message displayed when a package name does not match the specified pattern. -->
+            <message key="name.invalidPattern"
+                     value="Package name ''{0}'' must match pattern ''{1}''."/>
+        </module>
+
+        <!-- TypeName Module -->
+        <!-- Checks that type names (classes, interfaces, enums, annotations, records) conform to a defined naming convention. -->
+        <module name="TypeName">
+            <!-- Specifies the tokens (code elements) this rule applies to. -->
+            <property name="tokens" value="CLASS_DEF, INTERFACE_DEF, ENUM_DEF,
+            ANNOTATION_DEF, RECORD_DEF"/>
+            <!-- Message to display when a type name violates the naming convention. -->
+            <message key="name.invalidPattern"
+                     value="Type name ''{0}'' must match pattern ''{1}''."/>
+        </module>
+
+        <!-- MemberName Module -->
+        <!-- Validates that member names (variables within a class) follow a specified naming pattern. -->
+        <module name="MemberName">
+            <!-- Pattern that member names must follow. -->
+            <property name="format" value="^[a-z][a-z0-9][a-zA-Z0-9]*$"/>
+            <!-- Violation message for member names that do not conform to the pattern. -->
+            <message key="name.invalidPattern"
+                     value="Member name ''{0}'' must match pattern ''{1}''."/>
+        </module>
+
+        <!-- ParameterName Module -->
+        <!-- Ensures that method parameter names meet a defined naming standard. -->
+        <module name="ParameterName">
+            <!-- Defines the acceptable pattern for parameter names. -->
+            <property name="format" value="^[a-z]([a-z0-9][a-zA-Z0-9]*)?$"/>
+            <!-- Custom violation message for parameters that do not match the required pattern. -->
+            <message key="name.invalidPattern"
+                     value="Parameter name ''{0}'' must match pattern ''{1}''."/>
+        </module>
+        <!-- LambdaParameterName Module -->
+        <!-- Ensures lambda parameter names follow a specific naming pattern, promoting consistency and readability in the code. -->
+        <module name="LambdaParameterName">
+            <!-- Regular expression defining the allowed lambda parameter name format. -->
+            <property name="format" value="^[a-z]([a-z0-9][a-zA-Z0-9]*)?$"/>
+            <!-- Custom message displayed when a lambda parameter name does not match the specified pattern. -->
+            <message key="name.invalidPattern"
+                     value="Lambda parameter name ''{0}'' must match pattern ''{1}''."/>
+        </module>
+
+        <!-- CatchParameterName Module -->
+        <!-- Validates catch parameter names against a defined naming convention to ensure code consistency. -->
+        <module name="CatchParameterName">
+            <!-- Pattern that catch parameter names must adhere to. -->
+            <property name="format" value="^[a-z]([a-z0-9][a-zA-Z0-9]*)?$"/>
+            <!-- Message to display when a catch parameter name violates the naming convention. -->
+            <message key="name.invalidPattern"
+                     value="Catch parameter name ''{0}'' must match pattern ''{1}''."/>
+        </module>
+
+        <!-- LocalVariableName Module -->
+        <!-- Checks local variable names for compliance with a specified naming pattern, enhancing code readability. -->
+        <module name="LocalVariableName">
+            <!-- Specifies the acceptable pattern for local variable names. -->
+            <property name="format" value="^[a-z]([a-z0-9][a-zA-Z0-9]*)?$"/>
+            <!-- Custom violation message for local variables that do not match the required pattern. -->
+            <message key="name.invalidPattern"
+                     value="Local variable name ''{0}'' must match pattern ''{1}''."/>
+        </module>
+
+        <!-- PatternVariableName Module -->
+        <!-- Enforces a naming convention for pattern variable names to maintain consistency across the codebase. -->
+        <module name="PatternVariableName">
+            <!-- Defines the pattern that pattern variable names must follow. -->
+            <property name="format" value="^[a-z]([a-z0-9][a-zA-Z0-9]*)?$"/>
+            <!-- Violation message for pattern variable names that do not conform to the specified pattern. -->
+            <message key="name.invalidPattern"
+                     value="Pattern variable name ''{0}'' must match pattern ''{1}''."/>
+        </module>
+        <!-- ClassTypeParameterName Module -->
+        <!-- Ensures class type parameter names follow a specific naming convention, enhancing code readability and consistency. -->
+        <module name="ClassTypeParameterName">
+            <!-- Pattern for class type parameter names, allowing a single uppercase letter optionally followed by a number or a name ending in 'T'. -->
+            <property name="format" value="(^[A-Z][0-9]?)$|([A-Z][a-zA-Z0-9]*[T]$)"/>
+            <!-- Message displayed when a class type parameter name does not match the specified pattern. -->
+            <message key="name.invalidPattern"
+                     value="Class type name ''{0}'' must match pattern ''{1}''."/>
+        </module>
+
+        <!-- RecordComponentName Module -->
+        <!-- Validates record component names against a defined naming convention to ensure consistency across the codebase. -->
+        <module name="RecordComponentName">
+            <!-- Naming pattern for record components, starting with a lowercase letter followed by any combination of alphanumeric characters. -->
+            <property name="format" value="^[a-z]([a-z0-9][a-zA-Z0-9]*)?$"/>
+            <!-- Violation message for record component names that do not conform to the pattern. -->
+            <message key="name.invalidPattern"
+                     value="Record component name ''{0}'' must match pattern ''{1}''."/>
+        </module>
+
+        <!-- RecordTypeParameterName Module -->
+        <!-- Enforces naming conventions for type parameters in record declarations. -->
+        <module name="RecordTypeParameterName">
+            <!-- Acceptable pattern for record type parameter names, similar to class type parameter naming rules. -->
+            <property name="format" value="(^[A-Z][0-9]?)$|([A-Z][a-zA-Z0-9]*[T]$)"/>
+            <!-- Custom message for record type parameter names that fail to meet the naming standard. -->
+            <message key="name.invalidPattern"
+                     value="Record type name ''{0}'' must match pattern ''{1}''."/>
+        </module>
+
+        <!-- MethodTypeParameterName Module -->
+        <!-- Checks method type parameter names for adherence to a specified naming convention. -->
+        <module name="MethodTypeParameterName">
+            <!-- Defines the naming pattern for method type parameters, ensuring consistency with class and record type parameters. -->
+            <property name="format" value="(^[A-Z][0-9]?)$|([A-Z][a-zA-Z0-9]*[T]$)"/>
+            <!-- Message to display when a method type parameter name does not conform to the established pattern. -->
+            <message key="name.invalidPattern"
+                     value="Method type name ''{0}'' must match pattern ''{1}''."/>
+        </module>
+
+        <!-- InterfaceTypeParameterName Module -->
+        <!-- Ensures interface type parameter names follow a specific naming convention, enhancing code readability and consistency. -->
+        <module name="InterfaceTypeParameterName">
+            <!-- Pattern for interface type parameter names, allowing a single uppercase letter optionally followed by a number or a name ending in 'T'. -->
+            <property name="format" value="(^[A-Z][0-9]?)$|([A-Z][a-zA-Z0-9]*[T]$)"/>
+            <!-- Message displayed when an interface type parameter name does not match the specified pattern. -->
+            <message key="name.invalidPattern"
+                     value="Interface type name ''{0}'' must match pattern ''{1}''."/>
+        </module>
+
+        <!-- NoFinalizer Module -->
+        <!-- Prohibits the use of finalizers to avoid unpredictable behavior and potential performance issues. -->
+
+        <module name="NoFinalizer"/>
+
+        <!-- GenericWhitespace Module -->
+        <!-- Checks for correct use of whitespace around generic type parameters to ensure code readability and adherence to Java coding standards. -->
+        <module name="GenericWhitespace">
+            <!-- Message for when whitespace is incorrectly placed after a generic type, violating the standard. -->
+            <message key="ws.followed"
+                     value="GenericWhitespace ''{0}'' is followed by whitespace."/>
+            <!-- Message for when whitespace is incorrectly placed before a generic type, violating the standard. -->
+            <message key="ws.preceded"
+                     value="GenericWhitespace ''{0}'' is preceded with whitespace."/>
+            <!-- Message for when whitespace should follow a generic type but does not, violating the standard. -->
+            <message key="ws.illegalFollow"
+                     value="GenericWhitespace ''{0}'' should followed by whitespace."/>
+            <!-- Message for when whitespace is not placed before a generic type when it should be, violating the standard. -->
+            <message key="ws.notPreceded"
+                     value="GenericWhitespace ''{0}'' is not preceded with whitespace."/>
+        </module>
+
+        <!-- Indentation Module -->
+        <!-- Configures indentation rules to ensure consistent use of spaces for indentation across the codebase. -->
+        <module name="Indentation">
+            <!-- Sets the basic amount of space for one indentation level. -->
+            <property name="basicOffset" value="2"/>
+            <!-- Adjusts the indentation level for braces. -->
+            <property name="braceAdjustment" value="2"/>
+            <!-- Specifies indentation for case statements within switch blocks. -->
+            <property name="caseIndent" value="2"/>
+            <!-- Defines indentation for lines after a throws keyword. -->
+            <property name="throwsIndent" value="4"/>
+            <!-- Configures indentation for line wraps. -->
+            <property name="lineWrappingIndentation" value="4"/>
+            <!-- Sets indentation for array initializations. -->
+            <property name="arrayInitIndent" value="2"/>
+        </module>
+
+        <!-- AbbreviationAsWordInName Module -->
+        <!-- Enforces naming conventions to avoid the use of abbreviations or to limit their length in identifiers. -->
+        <module name="AbbreviationAsWordInName">
+            <!-- Determines whether final variables are ignored by this check. -->
+            <property name="ignoreFinal" value="false"/>
+            <!-- Sets the maximum length of an abbreviation in an identifier name. -->
+            <property name="allowedAbbreviationLength" value="0"/>
+            <!-- Specifies the tokens (code elements) this rule applies to. -->
+            <property name="tokens"
+                      value="CLASS_DEF, INTERFACE_DEF, ENUM_DEF, ANNOTATION_DEF, ANNOTATION_FIELD_DEF,
+            PARAMETER_DEF, VARIABLE_DEF, METHOD_DEF, PATTERN_VARIABLE_DEF, RECORD_DEF,
+            RECORD_COMPONENT_DEF"/>
+        </module>
+
+        <!-- OverloadMethodsDeclarationOrder Module -->
+        <!-- Checks that overloaded methods are grouped together. This enhances code readability by keeping methods with the same name (but different parameters) adjacent. -->
+        <module name="OverloadMethodsDeclarationOrder"/>
+
+        <!-- VariableDeclarationUsageDistance Module -->
+        <!-- Enforces a limit on the distance between the declaration of a variable and its first use. This can improve code readability by ensuring that variables are used close to where they are defined. -->
+        <module name="VariableDeclarationUsageDistance"/>
+
+        <!-- CustomImportOrder Module -->
+        <!-- Configures the order of import statements according to specified rules. This module can enforce a consistent import ordering, improving code readability and maintainability. -->
+        <module name="CustomImportOrder">
+            <!-- Sorts imports alphabetically within each group. -->
+            <property name="sortImportsInGroupAlphabetically" value="true"/>
+            <!-- Enforces a blank line between different import groups. -->
+            <property name="separateLineBetweenGroups" value="true"/>
+            <!-- Defines custom rules for import ordering. In this case, static imports are placed first, followed by third-party package imports. -->
+            <property name="customImportOrderRules" value="STATIC###THIRD_PARTY_PACKAGE"/>
+            <!-- Specifies the tokens (code elements) this rule applies to. -->
+            <property name="tokens" value="IMPORT, STATIC_IMPORT, PACKAGE_DEF"/>
+        </module>
+
+        <!-- MethodParamPad Module -->
+        <!-- Checks for padding (spaces) around the parameters in method and constructor definitions. This module ensures consistency in the use of spaces around parameters. -->
+        <module name="MethodParamPad">
+            <!-- Specifies the tokens (code elements) this rule applies to, including constructors, method calls, and method definitions. -->
+            <property name="tokens"
+                      value="CTOR_DEF, LITERAL_NEW, METHOD_CALL, METHOD_DEF,
+            SUPER_CTOR_CALL, ENUM_CONSTANT_DEF, RECORD_DEF"/>
+        </module>
+
+        <!-- NoWhitespaceBefore Module -->
+        <!-- Prevents whitespace before specific tokens to maintain coding standards. -->
+        <!-- "allowLineBreaks" permits line breaks before tokens, offering flexibility in formatting. -->
+        <module name="NoWhitespaceBefore">
+            <property name="tokens"
+                      value="COMMA, SEMI, POST_INC, POST_DEC, DOT,
+            LABELED_STAT, METHOD_REF"/>
+            <property name="allowLineBreaks" value="true"/>
+        </module>
+
+        <!-- ParenPad Module -->
+        <!-- Controls padding (spaces) inside parentheses to ensure consistency in the use of spaces. -->
+        <module name="ParenPad">
+            <property name="tokens"
+                      value="ANNOTATION, ANNOTATION_FIELD_DEF, CTOR_CALL, CTOR_DEF, DOT, ENUM_CONSTANT_DEF,
+            EXPR, LITERAL_CATCH, LITERAL_DO, LITERAL_FOR, LITERAL_IF, LITERAL_NEW,
+            LITERAL_SWITCH, LITERAL_SYNCHRONIZED, LITERAL_WHILE, METHOD_CALL,
+            METHOD_DEF, QUESTION, RESOURCE_SPECIFICATION, SUPER_CTOR_CALL, LAMBDA,
+            RECORD_DEF"/>
+        </module>
+
+        <!-- OperatorWrap Module -->
+        <!-- Enforces line wrapping policies for operators to improve code readability. -->
+        <!-- "option" set to "NL" (New Line) specifies that operators should be followed by a newline. -->
+        <module name="OperatorWrap">
+            <property name="option" value="NL"/>
+            <property name="tokens"
+                      value="BAND, BOR, BSR, BXOR, DIV, EQUAL, GE, GT, LAND, LE, LITERAL_INSTANCEOF, LOR,
+            LT, MINUS, MOD, NOT_EQUAL, PLUS, QUESTION, SL, SR, STAR, METHOD_REF,
+            TYPE_EXTENSION_AND "/>
+        </module>
+
+        <!-- AnnotationLocation Module for Most Cases -->
+        <!-- This module specifies the location of annotations in most cases, including classes, interfaces, enums, methods, constructors, records, and compact constructors. It ensures that annotations are placed consistently across these elements. -->
+        <module name="AnnotationLocation">
+            <property name="id" value="AnnotationLocationMostCases"/>
+            <property name="tokens"
+                      value="CLASS_DEF, INTERFACE_DEF, ENUM_DEF, METHOD_DEF, CTOR_DEF,
+              RECORD_DEF, COMPACT_CTOR_DEF"/>
+        </module>
+
+        <!-- AnnotationLocation Module for Variables -->
+        <!-- This module defines the annotation location specifically for variable definitions. It allows multiple annotations on the same line for variables, promoting readability and compactness. -->
+        <module name="AnnotationLocation">
+            <property name="id" value="AnnotationLocationVariables"/>
+            <property name="tokens" value="VARIABLE_DEF"/>
+            <property name="allowSamelineMultipleAnnotations" value="true"/>
+        </module>
+
+        <!-- NonEmptyAtclauseDescription Module -->
+        <!-- Enforces that Javadoc at-clauses (@param, @return, etc.) must have descriptions. This module ensures that documentation is not only present but also descriptive. -->
+        <module name="NonEmptyAtclauseDescription"/>
+
+        <!-- RequireEmptyLineBeforeBlockTagGroup Module -->
+        <!-- This module requires an empty line before the Javadoc block tag group. It enhances the readability of Javadoc comments by clearly separating the description from the block tags. -->
+        <module name="RequireEmptyLineBeforeBlockTagGroup"/>
+
+        <!-- AtclauseOrder Module -->
+        <!-- Specifies the order of Javadoc at-clauses to maintain consistency across the codebase. It ensures that tags like @param, @return, @throws, and @deprecated appear in a defined sequence. -->
+        <module name="AtclauseOrder">
+            <property name="tagOrder" value="@param, @return, @throws, @deprecated"/>
+            <property name="target"
+                      value="CLASS_DEF, INTERFACE_DEF, ENUM_DEF, METHOD_DEF, CTOR_DEF, VARIABLE_DEF"/>
+        </module>
+
+        <!-- MethodName Module -->
+        <!-- Ensures that method names adhere to a specified regular expression pattern. This helps maintain a consistent naming convention across the codebase. -->
+        <module name="MethodName">
+            <!-- The regular expression pattern that method names must match. It requires method names to start with a lowercase letter, followed by any combination of lowercase letters, numbers, and underscores. -->
+            <property name="format" value="^[a-z][a-z0-9][a-zA-Z0-9_]*$"/>
+            <!-- Custom message displayed when a method name does not match the specified pattern. -->
+            <message key="name.invalidPattern"
+                     value="Method name ''{0}'' must match pattern ''{1}''."/>
+        </module>
+
+        <!-- SingleLineJavadoc Module -->
+        <!-- Checks that Javadoc comments are single-line. This module can be used to enforce a concise documentation style for methods, fields, and classes. -->
+        <module name="SingleLineJavadoc"/>
+
+        <!-- EmptyCatchBlock Module -->
+        <!-- Enforces a naming convention for exception variables in empty catch blocks. This can be used to identify catch blocks that are intentionally left empty. -->
+        <module name="EmptyCatchBlock">
+            <!-- Specifies the expected variable name in empty catch blocks. This helps in distinguishing between overlooked and intentionally empty catch blocks. -->
+            <property name="exceptionVariableName" value="expected"/>
+        </module>
+
+        <!-- CommentsIndentation Module -->
+        <!-- Ensures proper indentation of single-line and block comments. This module helps maintain readability and consistency in the use of comments throughout the code. -->
+        <module name="CommentsIndentation">
+            <!-- Specifies the types of comments to check for correct indentation. This includes both single-line comments and the beginning of block comments. -->
+            <property name="tokens" value="SINGLE_LINE_COMMENT, BLOCK_COMMENT_BEGIN"/>
+        </module>
+
+        <!-- SuppressionXpathFilter Module -->
+        <!-- Allows for the suppression of specific Checkstyle violations based on XPath queries. This module provides a flexible way to ignore certain checks in specific scenarios. -->
+        <!-- For more details on configuring this module, visit: https://checkstyle.org/config_filters.html#SuppressionXpathFilter -->
+        <module name="SuppressionXpathFilter">
+            <!-- Specifies the path to the suppression file that contains XPath queries for suppressing specific violations. -->
+            <property name="file" value="${org.checkstyle.google.suppressionxpathfilter.config}"
+                      default="checkstyle-xpath-suppressions.xml" />
+            <!-- When set to true, makes the suppression file optional, allowing Checkstyle to run without it if the file is not found. -->
+            <property name="optional" value="true"/>
+        </module>
+    </module>
+</module>

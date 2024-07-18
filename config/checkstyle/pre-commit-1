@@ -1,0 +1,72 @@
+#!/bin/sh
+
+# get the current branch
+BRANCH=$(git rev-parse --abbrev-ref HEAD)
+
+# get the remote default branch
+# if the remote default branch is not set, it will be set to master
+# you can change the default branch to main or any other branch by changing the value of REMOTE_DEFAULT_BRANCH example: REMOTE_DEFAULT_BRANCH=your_default_branch
+REMOTE_DEFAULT_BRANCH=$(git symbolic-ref refs/remotes/origin/HEAD | sed 's@^refs/remotes/origin/@@')
+
+# get the changed files compared to the remote default branch and only the java files
+CHANGED_FILES=$(git diff --name-only $REMOTE_DEFAULT_BRANCH...$BRANCH | grep ".java$")
+
+# Find the root directory of the git repository
+REPO_ROOT=$(git rev-parse --show-toplevel)
+
+# Construct the path to the checkstyle jar file relative to the repository root
+CHECKSTYLE_JAR="$REPO_ROOT/config/checkstyle/checkstyle-10.17.0-all.jar"
+
+# Checkstyle configuration file
+CHECKSTYLE_CONFIG="$REPO_ROOT/config/checkstyle/checkstyle.xml"
+
+# Check if there are any Java files changed. If not, exit early.
+if [ -z "$CHANGED_FILES" ]; then
+    echo "No Java files have been changed."
+    exit 0
+fi
+
+# Run the checkstyle command on the changed files and save the output to a variable
+CHECKSTYLE_OUTPUT=$(java -jar "$CHECKSTYLE_JAR" -c "$CHECKSTYLE_CONFIG" $CHANGED_FILES)
+CHECKSTYLE_EXIT_STATUS=$?
+
+echo "Current branch is $BRANCH"
+echo "Remote default branch is $REMOTE_DEFAULT_BRANCH"
+echo "Changed java files compare to default branch $CHANGED_FILES"
+echo "Checkstyle exit status is $CHECKSTYLE_EXIT_STATUS"
+echo "$CHECKSTYLE_OUTPUT"
+
+# Check if Checkstyle found any issues
+if [ $CHECKSTYLE_EXIT_STATUS -eq 0 ]; then
+    echo "Checkstyle checks passed."
+    echo "See the checkstyle violations report at $REPO_ROOT/report.txt"
+    exit 0
+else
+    echo "Checkstyle violations found. Please fix them before committing."
+    echo "See the checkstyle violations main report at $REPO_ROOT/build/reports/checkstyle/main.html"
+    echo "See the checkstyle violations test report at $REPO_ROOT/build/reports/checkstyle/test.html"
+    exit 1
+fi
+
+cat $REPO_ROOT/report.txt | awk 'NR==1{print "\033[1;31m" $0 "\033[0m"}; NR>1{if (NR==FNR) {print} else {print "\033[31m" $0 "\033[0m"}}'
+
+stage('Run Checkstyle') {
+    steps {
+        sh '''
+        # Your existing code here
+
+        # Save the output of the command to a variable
+        def checkstyleOutput = sh(script: "cat $REPO_ROOT/report.txt | awk 'NR==1{print \"\\033[1;31m\" \$0 \"\\033[0m\"}; NR>1{if (NR==FNR) {print} else {print \"\\033[31m\" \$0 \"\\033[0m\"}}'", returnStdout: true).trim()
+
+        // Rest of your code
+
+        echo "Current branch is $BRANCH"
+        echo "Remote default branch is $REMOTE_DEFAULT_BRANCH"
+        echo "Changed java files compare to default branch $CHANGED_FILES"
+        echo "Checkstyle exit status is $CHECKSTYLE_EXIT_STATUS"
+        echo "$CHECKSTYLE_OUTPUT"
+
+        // Rest of your code
+        '''
+    }
+}
